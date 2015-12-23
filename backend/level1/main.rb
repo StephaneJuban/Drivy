@@ -1,32 +1,82 @@
 require 'json'
 require 'date'
 
-@data = JSON.parse( IO.read('data.json') )
-@output = {'rentals' => []}
 
-def get_rental_price(rental)
-  # Get the rental details
-  start_date = Date.parse(rental['start_date']).mjd
-  end_date = Date.parse(rental['end_date']).mjd
-  distance = rental['distance']
-  car_id = rental['car_id']
 
-  # Get the car data from the rental details
-  unless car = @data['cars'].find {|hash| hash['id'] == car_id}
-    raise "Cannot find the car with id=#{car_id}"
+module Drivy
+  @@data = JSON.parse( IO.read('data.json') )
+  @@cars = Array.new
+  @@rentals = Array.new
+
+
+  class Car
+    attr_accessor :id, :price_per_day, :price_per_km
+
+    def initialize(args)
+      args.each do |k, v|
+        instance_variable_set("@#{k}", v) unless v.nil?
+      end
+    end
   end
 
-  # Get the duration of the rental
-  duration = (end_date - start_date) + 1
 
-  # Return the price for the rental
-  (duration * car['price_per_day']) + (distance * car['price_per_km'])
+  class Rental
+    attr_accessor :id, :car_id, :start_date, :end_date, :distance
+
+    def initialize(args)
+      args.each do |k, v|
+        instance_variable_set("@#{k}", v) unless v.nil?
+      end
+    end
+
+    # Get the car associated to this rental
+    def car
+      Drivy.cars[self.car_id]
+    end
+
+    # Get the total duration of the rental
+    def duration
+      ( Date.parse(self.end_date).mjd - Date.parse(self.start_date).mjd ) + 1
+    end
+
+    def price
+      (self.duration * self.car.price_per_day) + (self.distance * self.car.price_per_km)
+    end
+  end
+
+
+  @@data['cars'].each do |car|
+    @@cars[car['id']] = Car.new(car)
+  end
+
+  @@data['rentals'].each do |rental|
+    @@rentals[rental['id']] = Rental.new(rental)
+  end
+
+  def self.data
+    @@data
+  end
+
+  def self.cars
+    @@cars
+  end
+
+  def self.rentals
+    @@rentals
+  end
+
+  def self.write_output
+    output = {'rentals' => []}
+    self.rentals.each do |rental|
+      output['rentals'].push('id' => rental.id, 'price' => rental.price) unless rental.nil?
+    end
+
+    File.open("output2.json","w") do |f|
+      f.write(JSON.pretty_generate(output))
+    end
+  end
 end
 
-@data['rentals'].each do |rental|
-  @output['rentals'].push('id' => rental['id'], 'price' => get_rental_price(rental));
-end
 
-File.open("output2.json","w") do |f|
-  f.write(JSON.pretty_generate(@output))
-end
+
+Drivy.write_output
