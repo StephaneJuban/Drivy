@@ -1,1 +1,0 @@
-exec("ruby level1/main.rb")
