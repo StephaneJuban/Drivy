@@ -1,6 +1,7 @@
 require 'json'
 require 'date'
 require 'fileutils'
+require 'colorize'
 
 
 module Drivy
@@ -84,11 +85,19 @@ module Drivy
     @@rentals
   end
 
-  def self.save(level)
+  # Generate the output
+  def self.output
     output = {'rentals' => []}
+
     self.rentals.each do |rental|
       output['rentals'].push('id' => rental.id, 'price' => rental.price) unless rental.nil?
     end
+
+    return output
+  end
+
+  def self.save(level)
+    self.output
 
     File.open("level#{level}/output2.json","w") do |f|
       f.write(JSON.pretty_generate(output))
@@ -96,10 +105,10 @@ module Drivy
   end
 
   def self.test(level)
-    if FileUtils.compare_file('level1/output.json', 'level1/output2.json')
-      puts "[Level #{level}] OK"
+    if FileUtils.compare_file("level#{level}/output.json", "level#{level}/output2.json")
+      puts "[Level #{level}] OK".green
     else
-      puts "[Level #{level}] KO"
+      puts "[Level #{level}] KO".red
     end
   end
 end
