@@ -32,6 +32,17 @@ module Drivy
 
       return self.actions
     end
+
+    def print_actions
+      # Format the actions to the desired format
+      actions = Array.new
+
+      self.actions.each do |action|
+        actions.push('who' => action.who, 'type' => action.type, 'amount' => action.amount)
+      end
+
+      return actions
+    end
   end
 
   # [OVERRIDE] Generate the output
@@ -49,16 +60,10 @@ module Drivy
         # Generate the actions needed for the rental
         rental.generate_actions
 
-        # Format the actions to the desired format
-        actions = Array.new
-        rental.actions.each do |action|
-          actions.push('who' => action.who, 'type' => action.type, 'amount' => action.amount)
-        end
-
         # Generate the output format
         output['rentals'].push(
                                 'id'          =>  rental.id,
-                                'actions'     =>  actions
+                                'actions'     =>  rental.print_actions
                               )
       end
     end
