@@ -1,22 +1,20 @@
-require_relative '../level2/drivy.rb'
+require_relative '../level3/drivy.rb'
 
 
 module Drivy
   class Rental
-    attr_accessor :insurance_fee, :assistance_fee, :drivy_fee
+    attr_accessor :deductible_reduction, :deductible_reduction_fee
 
-    # Get the commissions associated to this rental
-    def calculate_commissions
-      # We take 30% of the final price
-      commission = (self.price * 0.3).round
+    # Apply options to the rental according to the data
+    def apply_options
+      # Initialize
+      self.deductible_reduction_fee = 0
 
-      # We split this commission into fees
-      # Half goes to the insurance
-      self.insurance_fee  = (commission * 0.5).round
-      # 1€/day goes to the roadside assistance. Is it not 100€ instead of 1€ ?
-      self.assistance_fee = self.duration * 100
-      # The rest goes to us
-      self.drivy_fee      = commission - self.insurance_fee - self.assistance_fee
+      # If the driver subscribed to the deductible reduction option
+      if self.deductible_reduction
+        self.deductible_reduction_fee = self.duration * 400
+      end
+
     end
   end
 
@@ -30,10 +28,16 @@ module Drivy
         # Calculate the commissions fees for every rentals
         rental.calculate_commissions
 
+        # Apply options on the rental if needed
+        rental.apply_options
+
         # Generate the output format
         output['rentals'].push(
                                 'id'          =>  rental.id,
                                 'price'       =>  rental.price,
+                                'options'     =>  {
+                                                    'deductible_reduction' => rental.deductible_reduction_fee
+                                                  },
                                 'commission'  =>  {
                                                     'insurance_fee'   => rental.insurance_fee,
                                                     'assistance_fee'  => rental.assistance_fee,
