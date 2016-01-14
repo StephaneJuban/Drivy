@@ -2,6 +2,7 @@ require_relative '../level4/drivy.rb'
 
 
 module Drivy
+  # Reprensent an action with its arguments associated to a rental
   class Action
     attr_accessor :who, :type, :amount
 
@@ -22,6 +23,7 @@ module Drivy
 
     # Generate the actions needed for the rental
     def generate_actions
+      # List of actions for one rental
       self.actions = Array.new
 
       self.actions << Action.new(:who => "driver",      :type => "debit",   :amount => (self.price + self.deductible_reduction_fee))
@@ -33,8 +35,8 @@ module Drivy
       return self.actions
     end
 
+    # Format the actions to the desired format
     def print_actions
-      # Format the actions to the desired format
       actions = Array.new
 
       self.actions.each do |action|

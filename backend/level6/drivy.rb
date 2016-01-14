@@ -2,8 +2,10 @@ require_relative '../level5/drivy.rb'
 
 
 module Drivy
+  # List of modifications
   @@modifications = Array.new
 
+  # A modification is associated to a rental
   class Modification
     attr_accessor :id, :rental_id, :start_date, :end_date, :distance
 
@@ -19,6 +21,7 @@ module Drivy
     # Create a new attribute to check if there is a modification for this rental
     attr_accessor :rental_modification
 
+    # All the actions needed to generate a rental
     def processing
       # Calculate the commissions fees for every rentals
       self.calculate_commissions
@@ -73,6 +76,7 @@ module Drivy
     end
   end
 
+
   # [OVERRIDE] Load the data (cars, rentals & modifications) from a JSON file
   def self.load(level)
     @@data = JSON.parse( IO.read("level#{level}/data.json") )
@@ -93,6 +97,7 @@ module Drivy
   end
 
 
+  # Return the list of modifications
   def self.modifications
     @@modifications
   end

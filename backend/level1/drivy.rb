@@ -1,15 +1,32 @@
+# For parsing and generate JSON file
 require 'json'
+# To manipulate rental's dates
 require 'date'
+# To generate the output file
 require 'fileutils'
+# For colorful outputs for tests
 require 'colorize'
 
 
+# This is our main module that contains everything
 module Drivy
+  ##############################################################################
+  # Module variables
+  ##############################################################################
+
+  # Contains the JSON file parsed
   @@data = nil
+  # List of cars
   @@cars = Array.new
+  # List of rentals
   @@rentals = Array.new
 
 
+  ##############################################################################
+  # Classes
+  ##############################################################################
+
+  # Reprensent a car with its arguments
   class Car
     attr_accessor :id, :price_per_day, :price_per_km
 
@@ -21,6 +38,11 @@ module Drivy
   end
 
 
+  # Reprensent a rental with its argument. A rental is associated to one car
+  # thanks to the car_id we return directly the car object to simulate a
+  # belongs_to.
+  # We also split the price into multiple sub-method to be more flexible with
+  # the next levels.
   class Rental
     attr_accessor :id, :car_id, :start_date, :end_date, :distance
 
@@ -53,13 +75,18 @@ module Drivy
       return self.distance * self.car.price_per_km
     end
 
+    # Return the price of the rental
     def price
       duration_price + distance_price
     end
   end
 
 
-  # Load the data (cars & rentals) from a JSON file
+  ##############################################################################
+  # Module methods
+  ##############################################################################
+
+  # Load the data (cars & rentals) from a JSON file according to the level
   def self.load(level)
     @@data = JSON.parse( IO.read("level#{level}/data.json") )
 
@@ -72,15 +99,17 @@ module Drivy
     end
   end
 
-
+  # Return the parsed data
   def self.data
     @@data
   end
 
+  # Return the car list
   def self.cars
     @@cars
   end
 
+  # Return the rental list
   def self.rentals
     @@rentals
   end
@@ -96,6 +125,7 @@ module Drivy
     return output
   end
 
+  # Save the ouput into a file associated to the level
   def self.save(level)
     self.output
 
@@ -104,6 +134,7 @@ module Drivy
     end
   end
 
+  # Test the generated file and the desirated file
   def self.test(level)
     if FileUtils.compare_file("level#{level}/output.json", "level#{level}/output2.json")
       puts "[Level #{level}] OK".green

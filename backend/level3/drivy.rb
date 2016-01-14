@@ -13,7 +13,7 @@ module Drivy
       # We split this commission into fees
       # Half goes to the insurance
       self.insurance_fee  = (commission * 0.5).round
-      # 1€/day goes to the roadside assistance. Is it not 100€ instead of 1€ ?
+      # 1€/day goes to the roadside assistance.
       self.assistance_fee = self.duration * 100
       # The rest goes to us
       self.drivy_fee      = commission - self.insurance_fee - self.assistance_fee

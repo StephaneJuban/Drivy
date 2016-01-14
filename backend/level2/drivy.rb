@@ -3,6 +3,7 @@ require_relative '../level1/drivy.rb'
 
 module Drivy
   class Rental
+    # Calculate the discount according to the rental duration
     def discount
       case self.duration
       when 1
@@ -26,7 +27,7 @@ module Drivy
       end
     end
 
-    # Override the duration price of the rental according to the discount
+    # [OVERRIDE] Get the price related to the duration and the discount of the rental
     def duration_price
       return self.discount
     end
